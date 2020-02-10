@@ -9,6 +9,7 @@ import {MatCardModule} from '@angular/material/card';
 import { Ng2GoogleChartsModule } from "ng2-google-charts";
 import {MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 @NgModule({
   declarations: [Statement5Component, AnalyticsComponent],
   imports: [
@@ -18,7 +19,8 @@ import { FormsModule } from '@angular/forms';
     MatSelectModule,
     FormsModule,
     Ng2GoogleChartsModule,
-    MatCardModule
+    MatCardModule,
+    MatProgressSpinnerModule
     
     
   ]

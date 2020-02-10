@@ -3,6 +3,7 @@ import { AnalyticsService } from '../analytics.service';
 import { AuthService } from 'src/app/auth/auth.service';
 import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
 import { ChartSelectEvent } from 'ng2-google-charts';
+import { VirtualTimeScheduler } from 'rxjs';
 
 
 @Component({
@@ -11,37 +12,87 @@ import { ChartSelectEvent } from 'ng2-google-charts';
   styleUrls: ['./statement5.component.css']
 })
 export class Statement5Component implements OnInit {
+  // Array Declaration
   academicYears: string[] = [];
   termnumbers: [] = [];
   attendance_details = [];
+  placement_offers:any[] = [];
+  user_role:string[] =[];
+  faculty_role:string[] = ["FACULTY" ];
+  faculty_roles:string[] = ["FACULTY" , "COUNSELLOR"];
+  hod_role:string[] = ["FACULTY" , "DEPT_ADMIN" , "HOD"];
+  principal_role:string[] = ["FACULTY" , "COLLEGE_ADMIN" , "PRINCIPAL"];
+  student_role:string[] = ["STUDENT"];
+  fac_attend_details:any[] = [];
+  faculty_names:any[] =[];
+  dept_names:any[] = [];
+  //Chart Declarations
   public firstLevelChart: GoogleChartInterface;
+  public faculty_chart:GoogleChartInterface;
+  //string declarations
   title: string;
   error_message: string
+  //boolean Declarations
   error_flag = false
   chart_visibility = false;
+  fac_chart_visibility = false;
+  showSpinner = false;
+  facSpinner = false;
+  placement_status_displayed = false;
+  logged_hod = false;
+  logged_faculty = false;
+  logged_student = false;
+  logged_princi = false;
+  //data type declaration
   terms;
   selectedyear;
-  userRoles:string[]=[];
-  empID:string="";
-  email:any="";
-  event:any;
   user_info;
+  course_name;
+  total_present;
+  total_class;
+  faculty_id;
+  dept_name:any;
   selectedSubject;
-  showSpinner = false;
-  placementOn =false;
-  offers:any[] = [];
+  princi_Department;
+  hide_details_princi = false;
   attDetails:any[];
-  facultyChart:GoogleChartInterface;
 
   constructor(private analyticsService: AnalyticsService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.email=localStorage.getItem("user");
+    let u_info = localStorage.getItem('user');
+    let u = JSON.parse(u_info);
+    console.log(u);
+    this.faculty_id = u['employeeGivenId'];
+    this.user_role = u['roles'];
+    if (JSON.stringify(this.user_role) == JSON.stringify(this.hod_role))
+    {
+      this.logged_hod = true;
+    }
+    else if (JSON.stringify(this.user_role) == JSON.stringify(this.faculty_role) || JSON.stringify(this.user_role) == JSON.stringify(this.faculty_roles))
+    {
+      this.logged_faculty = true;
+    }
+    else if (JSON.stringify(this.user_role) == JSON.stringify(this.student_role))
+    {
+      this.logged_student = true;
+    }
+    else if(JSON.stringify(this.user_role) == JSON.stringify(this.principal_role))
+    {
+      this.logged_princi = true;
+    }
     this.user_info = this.authService.getUserInfo()
-    console.log("user",this.user_info)
     this.get_academic_years()
     this.get_term_numbers()
+    this.analyticsService.get_depts().subscribe(res=>{
+      let re = res['depts'];
+      for(let r of re)
+      {
+        this.dept_names.push(r)
+      }
+    })
   }
+
   get_academic_years() {
     this.analyticsService.get_academic_years().subscribe(res => {
       this.academicYears = res['acdemicYear']
@@ -55,9 +106,9 @@ export class Statement5Component implements OnInit {
     )
   }
 
-  searchbutton() {
-    if (!this.placementOn){
-      this.getPlacementrDetails()
+  studentsearch() {
+    if (!this.placement_status_displayed) {
+      this.getPlacementDetails()
     }
     this.showSpinner = true;
     this.analyticsService.get_attendance_details(this.user_info['usn'], this.selectedyear, this.terms).subscribe(res => {
@@ -66,27 +117,27 @@ export class Statement5Component implements OnInit {
     })
     
   }
-  getPlacementrDetails(){
-    this.placementOn = true;
-    this.analyticsService.get_offer_by_usn(this.selectedyear,this.user_info['usn']).subscribe(res =>{
+
+  getPlacementDetails() {
+    this.placement_status_displayed = true;
+    this.analyticsService.get_offer_by_usn(this.selectedyear, this.user_info['usn']).subscribe(res => {
       let re = res["offers"];
-        for(let r of re)
-        {
-          this.offers.push([r['companyName'],r['salary']])
-        }
+      for (let r of re) {
+        this.placement_offers.push([r['companyName'], r['salary']])
+      }
     })
   }
 
   attendace_data(data) {
     let dataTable = []
     dataTable.push([
-      "courseName",
+      "CourseName",
       "Attendance %", { type: 'string', role: 'tooltip' }
     ]);
 
     for (let i = 0; i < data.length; i += 1) {
       dataTable.push([data[i]['courseName'],
-       data[i]['attendance_per'],"Attendance % : " + data[i]['attendance_per']])
+      data[i]['attendance_per'], "Attendance % : " + data[i]['attendance_per']])
     }
 
     if (dataTable.length > 1) {
@@ -95,11 +146,11 @@ export class Statement5Component implements OnInit {
       this.graph_data(dataTable)
     }
     else {
+      this.showSpinner = false;
       this.error_flag = true
       this.error_message = "Data doesnot exist for the entered criteria"
     }
   }
-
 
   back_() {
     this.chart_visibility = false
@@ -108,14 +159,18 @@ export class Statement5Component implements OnInit {
 
   graph_data(data) {
     this.showSpinner = false
-    this.title = 'Course-wise Attendance %',
+    this.title = ' Attendance %',
       this.firstLevelChart = {
         chartType: "ColumnChart",
         dataTable: data,
         options: {
-          bar: { groupWidth: "20%" },
+          bar: { groupWidth: "10%" },
           vAxis: {
-            title: "Attendance %",
+            title: "Percentage",
+            viewWindow: {
+              max:100,
+              min:0
+          }
           },
 
           height: 800,
@@ -134,7 +189,7 @@ export class Statement5Component implements OnInit {
             alignment: "end"
           },
           seriesType: "bars",
-          colors: [ "#2ebf91"],
+          colors: ["#2ebf91"],
           fontName: "Times New Roman",
           fontSize: 13,
 
@@ -143,7 +198,6 @@ export class Statement5Component implements OnInit {
       }
   }
   second_level(event: ChartSelectEvent) {
-    //console.log("Chart Event", event)
     this.selectedSubject = event.selectedRowValues[0]
     this.analyticsService.getAttendanceDetails(this.selectedyear,this.user_info['usn'],this.terms,this.selectedSubject).subscribe(res=>{
       let allAttendance=res["attendance_d"]
@@ -153,6 +207,149 @@ export class Statement5Component implements OnInit {
       }
       this.attDetails=data1
       console.log(this.attDetails)
+    })
+  }
+
+  // Faculty Module
+
+  facultysearch()
+  {
+    console.log(this.faculty_id);
+    console.log(this.selectedyear);
+    console.log(this.terms)
+    this.analyticsService.get_selected_faculty_details(this.faculty_id,this.terms).subscribe(res =>{
+      let re = res["fac"];
+      console.log(re)
+      let db = [];
+      db.push(["courseName","Total Percentage"])
+      for(let r of re)
+      {
+        db.push([r['courseid'],r['totalPercentage']])
+      }
+      if (db.length > 1) {
+        this.fac_chart_visibility = true
+        this.error_flag = false
+        this.draw_faculty_chart(db)
+      }
+      else {
+        this.showSpinner = false;
+        this.error_flag = true
+        this.error_message = "Data doesnot exist for the entered criteria"
+      }
+    })
+  }
+
+  draw_faculty_chart(data)
+  {
+    this.facSpinner =true;
+    this.title = 'Course-wise Attendance %',
+    this.faculty_chart = {
+      chartType: "ColumnChart",
+      dataTable: data,
+      options: {
+        bar: { groupWidth: "10%" },
+        vAxis: {
+          title: "Percentage",
+          viewWindow: {
+            max:100,
+            min:0
+        }
+        },
+
+        height: 800,
+        hAxis: {
+          title: "Courses",
+          titleTextStyle: {
+          }
+        },
+        chartArea: {
+          left: 80,
+          right: 100,
+          top: 100,
+        },
+        legend: {
+          position: "top",
+          alignment: "end"
+        },
+        seriesType: "bars",
+        colors: ["#2ebf91"],
+        fontName: "Times New Roman",
+        fontSize: 13,
+
+      }
+
+    }
+  }
+
+  faculty_level(event: ChartSelectEvent) {
+    let subcode = event.selectedRowFormattedValues[0];
+    console.log(subcode);
+  }
+
+  // HOD MODULE
+
+  hodsearch()
+  {
+    this.faculty_names = [];
+    this.get_faculty_details();
+  }
+
+  get_faculty_details() {
+    let us = localStorage.getItem('user');
+    let u = JSON.parse(us);
+    let arr = u['employeeGivenId'];
+    let patt = new RegExp("[a-zA-z]*");
+    let res = patt.exec(arr);
+    this.dept_name =res[0];
+    this.analyticsService.get_dept_faculties(this.dept_name).subscribe(res => {
+      let na = res['faculty'];
+      for (let n of na) {
+        this.faculty_names.push([n['employeeGivenId'],n['name'].toUpperCase()]);
+      }
+      console.log("selected ",this.academicYears,this.terms);
+    })
+  }
+
+  getFacultyDetails(fac_id)
+  {
+    console.log(fac_id,this.terms)
+    this.analyticsService.get_selected_faculty_details(fac_id,this.terms).subscribe(res =>{
+      let re = res["fac"];
+      let db = [];
+      db.push(["Course Name","Total Percentage"])
+      for(let r of re)
+      {
+        db.push([r['courseid'],r['totalPercentage']])
+      }
+      if (db.length > 1) {
+        this.fac_chart_visibility = true
+        this.error_flag = false
+        this.draw_faculty_chart(db)
+      }
+      else {
+        this.showSpinner = false;
+        this.error_flag = true
+        this.error_message = "Data doesnot exist for the entered criteria"
+      }
+    })
+    
+  }
+
+  //principal
+
+  princisearch()
+  {
+    this.faculty_names = [];
+    this.get_faculty_details1();
+  }
+
+  get_faculty_details1() {
+    this.analyticsService.get_dept_faculties(this.princi_Department).subscribe(res => {
+      let na = res['faculty'];
+      for (let n of na) {
+        this.faculty_names.push([n['employeeGivenId'],n['name'].toUpperCase()]);
+      }
+      this.hide_details_princi = true;
     })
   }
 }

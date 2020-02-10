@@ -19,15 +19,33 @@ export class AnalyticsService {
   get_term_details(): Observable<any> {
     let url = `${this.baseurl}termNumber`;
     return this.http.get(url)
-
   }
+
+  get_usn_by_email(email):Observable<any>{
+    let url = `${this.baseurl}usn/${email}`;
+    return this.http.get(url);
+  }
+  get_depts(): Observable<any>{
+    let url = `${this.baseurl}depts`
+    return this.http.get(url)
+  }
+  get_dept_faculties(dept): Observable<any>{
+    let url = `${this.baseurl}emps/${dept}`
+    return this.http.get(url)
+  }
+
+  get_selected_faculty_details(empid,term):Observable<any>{
+    let ur = `${this.baseurl}get-selected-fac-details/${empid}/${term}`;
+    return this.http.get(ur);
+  }
+
    getAttendanceDetails(academicYear,usn,termNumber,subject):Observable<any>{
      let url=`${this.baseurl}attendance/${academicYear}/${usn}/${termNumber}/${subject}`
      return this.http.get(url)
    }
   
 
-  get_attendance_details(usn:string,year:any,terms:any):Observable<any>{
+  get_attendance_details(usn,year,terms):Observable<any>{
     let url = `${this.baseurl}attendancedetails/${usn}/${year}/${terms}`
     return this.http.get(url)
 
@@ -44,9 +62,6 @@ export class AnalyticsService {
     let ur = `${this.baseurl}emp/placement/${empid}/${sem}/${sub}`
     return this.http.get(ur)
   }
-  get_attendanceD_byFacSub(empid,sem,courseCode):Observable<any>{
-    let url =`${this.baseurl}attendancedetailsbyfac/${empid}/${sem}/${courseCode}`
-    return this.http.get(url)
-  }
+  
 
 }
