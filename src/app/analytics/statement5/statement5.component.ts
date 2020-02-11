@@ -333,7 +333,7 @@ export class Statement5Component implements OnInit {
       else {
         this.showSpinner = false;
         this.error_flag = true
-        this.error_message = "Data doesnot exist for the entered criteria"
+        this.error_message = "Data does not exist"
       }
     })
     
