@@ -58,9 +58,17 @@ export class AnalyticsService {
     let ur = `${this.baseurl}empid/${email}`
     return this.http.get(ur)
   }
+  get_single_course(emp , term):Observable<any>{
+    let ur = `${this.baseurl}get-single-course/${emp}/${term}`;
+    return this.http.get(ur);
+  }
   get_emp_placement_of_sub(empid,sem,sub): Observable<any>{
     let ur = `${this.baseurl}emp/placement/${empid}/${sem}/${sub}`
     return this.http.get(ur)
+  }
+  getNoCourse(empid,sub,term,year):Observable<any>{
+    let ur = `${this.baseurl}get_no_course/${empid}/${sub}/${term}/${year}`;
+    return this.http.get(ur);
   }
   
 

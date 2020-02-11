@@ -84,6 +84,7 @@
                 <div class="sk-cube3 sk-cube"></div>
             </div>
         </div>
+        <div class="row">
 
         <div class="row" *ngIf="placement_offers && placement_offers.length > 0 && logged_student">
             <div class="col-md-2" *ngFor="let o of placement_offers">
@@ -98,6 +99,10 @@
                 </div>
             </div>
         </div>
+        <div *ngIf="error_flag && !showSpinner">
+            <p class="page-title">{{error_message1}}</p>
+        </div>
+    </div>
 
         <div *ngIf="firstLevelChart && !error_flag && chart_visibility && !showSpinner &&logged_student">
             <p class="page-title"><b>{{title}}</b></p>
@@ -108,7 +113,8 @@
 
         <div *ngIf="faculty_chart && !error_flag && fac_chart_visibility  && logged_faculty">
             <p class="page-title"><b>{{title}}</b></p>
-                <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)">  </google-chart>
+                <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)" data-toggle="modal"
+                  data-target="#fac_modal">  </google-chart>
         </div>
 
         <div class="col-md-2" *ngIf="logged_hod">
@@ -129,7 +135,8 @@
 
         <div class="col-md-10" *ngIf="( logged_hod || logged_princi ) && faculty_chart && !error_flag && fac_chart_visibility">
             <p class="page-title"><b>{{title}}</b></p>
-            <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)">  </google-chart>
+            <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)" data-toggle="modal"
+                data-target="#fac_modal">  </google-chart>
         </div>
 
         <div *ngIf="error_flag && !showSpinner">
@@ -141,19 +148,20 @@
 <div class="modal fade" id="attdetail" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="background-color: #efeff5;">
                 <h5 class="modal-title">Attendance Details</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
+        
             <div class="modal-body">
                 <table class="table table-striped">
                     <tr>
 
-                        <th>Subject:</th>
-                        <th>classes conducted:</th>
-                        <th>Attended:</th>
+                        <th>Course Name:</th>
+                        <th>No' classes conducted:</th>
+                        <th>No' of classes Attended:</th>
                     </tr>
                     <tr *ngFor="let a of attDetails">
                         <td>{{a[0]}}</td>
@@ -162,34 +170,44 @@
                     </tr>
                 </table>
             </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fas fa-thumbs-up"></i>
+                    &nbsp; OK</button>
+             </div>
         </div>
     </div>
 </div>
-<!--
-<div class="modal fade" id="attdetail" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div id="fac_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+            <!-- Modal content-->
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Attendance Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+            <div class="modal-header" style="background-color: #efeff5;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title center"><b>Attendance & Placement Details</b></h4>
             </div>
             <div class="modal-body">
-                <table class="table table-striped">
-                    <tr>
+                <p><b>Course Name</b>: {{course_modal}}</p>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-10">
 
-                        <th>Subject:</th>
-                        <th>classes conducted:</th>
-                        <th>Attended:</th>
-                    </tr>
-                    <tr *ngFor="let a of attDetails">
-                        <td>{{a[0]}}</td>
-                        <td>{{a[1]}}</td>
-                        <td>{{a[2]}}</td>
-                    </tr>
-                </table>
+                        <b># Classes Conducted : </b>{{no_cls_conducted}}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    
+                    <div class="col-md-4"><b># Total Students :&nbsp;{{total_stu_modal}}</b></div>
+                    <div class="col-md-4"><b># Total Placed :&nbsp;{{placed_modal}}</b></div>
+                    <div class="col-md-4"><b># Total Class Offers :&nbsp;{{total_pos_modal}}</b></div>
+                </div>
             </div>
-        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fas fa-thumbs-up"></i>
+                    &nbsp; OK</button>
+             </div>
+         </div>
     </div>
-</div>-->
+</div>

@@ -20,14 +20,17 @@
     border: #000 !important;
    }*/
    .placement-card{
+     margin:10px;
+     box-shadow: 2px 2px maroon inset;
+     border: 1px solid black;
     display: inline-block;
-  }
-  .card-list{
+  } 
+  /* .card-list{
     display: inline-block;
     border:1px solid;
-   box-shadow: 5px 7px maroon inset;
+   
    padding: 3px;
-   }
+   } */
    
    .sk-folding-cube {
     margin: 20px auto;

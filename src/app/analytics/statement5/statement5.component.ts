@@ -32,8 +32,11 @@ export class Statement5Component implements OnInit {
   //string declarations
   title: string;
   error_message: string
+  error_message1: string
+  single_course_name :string;
   //boolean Declarations
-  error_flag = false
+  error_flag = false;
+  
   chart_visibility = false;
   fac_chart_visibility = false;
   showSpinner = false;
@@ -56,6 +59,13 @@ export class Statement5Component implements OnInit {
   princi_Department;
   hide_details_princi = false;
   attDetails:any[];
+  placementDetails : any[];
+  current_faculty;
+  course_modal;
+  placed_modal;
+  total_stu_modal;
+  total_pos_modal;
+  no_cls_conducted;
 
   constructor(private analyticsService: AnalyticsService, private authService: AuthService) { }
 
@@ -95,7 +105,7 @@ export class Statement5Component implements OnInit {
 
   get_academic_years() {
     this.analyticsService.get_academic_years().subscribe(res => {
-      this.academicYears = res['acdemicYear']
+      this.academicYears = res['academicYear']
     })
   }
 
@@ -109,6 +119,11 @@ export class Statement5Component implements OnInit {
   studentsearch() {
     if (!this.placement_status_displayed) {
       this.getPlacementDetails()
+    }
+    else{
+      this.error_flag = true
+      this.error_message1 = "Not placed yet..."
+      
     }
     this.showSpinner = true;
     this.analyticsService.get_attendance_details(this.user_info['usn'], this.selectedyear, this.terms).subscribe(res => {
@@ -212,44 +227,19 @@ export class Statement5Component implements OnInit {
 
   // Faculty Module
 
-  facultysearch()
-  {
-    console.log(this.faculty_id);
-    console.log(this.selectedyear);
-    console.log(this.terms)
-    this.analyticsService.get_selected_faculty_details(this.faculty_id,this.terms).subscribe(res =>{
-      let re = res["fac"];
-      console.log(re)
-      let db = [];
-      db.push(["courseName","Total Percentage"])
-      for(let r of re)
-      {
-        db.push([r['courseid'],r['totalPercentage']])
-      }
-      if (db.length > 1) {
-        this.fac_chart_visibility = true
-        this.error_flag = false
-        this.draw_faculty_chart(db)
-      }
-      else {
-        this.showSpinner = false;
-        this.error_flag = true
-        this.error_message = "Data doesnot exist for the entered criteria"
-      }
-    })
-  }
-
   draw_faculty_chart(data)
   {
     this.facSpinner =true;
+   
     this.title = 'Course-wise Attendance %',
     this.faculty_chart = {
-      chartType: "ColumnChart",
+      chartType: "ComboChart",
       dataTable: data,
       options: {
         bar: { groupWidth: "10%" },
         vAxis: {
           title: "Percentage",
+         
           viewWindow: {
             max:100,
             min:0
@@ -272,7 +262,7 @@ export class Statement5Component implements OnInit {
           alignment: "end"
         },
         seriesType: "bars",
-        colors: ["#2ebf91"],
+        colors: ["#2ebf91","#d3ad5d"],
         fontName: "Times New Roman",
         fontSize: 13,
 
@@ -280,12 +270,74 @@ export class Statement5Component implements OnInit {
 
     }
   }
-
   faculty_level(event: ChartSelectEvent) {
     let subcode = event.selectedRowFormattedValues[0];
-    console.log(subcode);
+    this.analyticsService.get_emp_placement_of_sub(this.current_faculty,this.terms,subcode).subscribe(res=>{
+      let re = res
+      this.course_modal = re['courseCode'];
+      this.total_stu_modal = re['totalStudents'];
+      this.placed_modal = re['placedStudents'];
+      this.total_pos_modal = re['totalPositions'];
+      
+    })
+    this.analyticsService.getNoCourse(this.current_faculty,subcode,this.terms,this.selectedyear).subscribe(res=>{
+      let r=res["course"][0]
+      this.no_cls_conducted=r['classes']
+    })
   }
 
+  facultysearch()
+  {
+    this.current_faculty = this.faculty_id;
+    this.analyticsService.get_selected_faculty_details(this.faculty_id,this.terms).subscribe(res =>{
+      let re = res["fac"];
+      
+      let db = [];
+      db.push(["Course Name","Attendance Percent","placePercentage"])
+      for(let r of re)
+      {
+        db.push([r['courseid'],r['totalPercentage'],r['placePercentage']])
+      }
+      if (db.length > 1) {
+        this.fac_chart_visibility = true
+        this.error_flag = false
+        this.draw_faculty_chart(db)
+      }
+      else {
+        this.showSpinner = false;
+        this.error_flag = true
+        this.error_message = "Data doesnot exist for the entered criteria"
+      }
+    })
+  }
+
+
+  getFacultyDetails(fac_id)
+  {
+    
+
+    this.current_faculty = fac_id
+    this.analyticsService.get_selected_faculty_details(fac_id,this.terms).subscribe(res =>{
+      let re = res["fac"];
+      let db = [];
+      db.push(["Course Name","Attendance Percent","Placement Percentage"])
+      for(let r of re)
+      {
+        db.push([r['courseid'],r['totalPercentage'],r['placePercentage']])
+      }
+      if (db.length > 1) {
+        this.fac_chart_visibility = true
+        this.error_flag = false
+        this.draw_faculty_chart(db)
+      }
+      else {
+        this.showSpinner = false;
+        this.error_flag = true
+        this.error_message = "Data doesnot exist for the entered criteria"
+      }
+    })
+    
+  }
   // HOD MODULE
 
   hodsearch()
@@ -310,30 +362,6 @@ export class Statement5Component implements OnInit {
     })
   }
 
-  getFacultyDetails(fac_id)
-  {
-    console.log(fac_id,this.terms)
-    this.analyticsService.get_selected_faculty_details(fac_id,this.terms).subscribe(res =>{
-      let re = res["fac"];
-      let db = [];
-      db.push(["Course Name","Total Percentage"])
-      for(let r of re)
-      {
-        db.push([r['courseid'],r['totalPercentage']])
-      }
-      if (db.length > 1) {
-        this.fac_chart_visibility = true
-        this.error_flag = false
-        this.draw_faculty_chart(db)
-      }
-      else {
-        this.showSpinner = false;
-        this.error_flag = true
-        this.error_message = "Data doesnot exist for the entered criteria"
-      }
-    })
-    
-  }
 
   //principal
 
