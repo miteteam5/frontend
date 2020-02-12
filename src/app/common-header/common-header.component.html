@@ -6,8 +6,8 @@
         <nav class="navbar navbar-fixed-top">
             <div class="container-fluid">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="http://localhost:4200/analytics"><span class="glyphicon glyphicon glyphicon-user" *ngIf="user">&nbsp;{{user.user}}</span> </a></li>
-                    <li><a href=""><i class="fas fa-users" (click)="logOut()"></i> Logout</a></li>
+                    <li><a href="http://localhost:4200/analytics"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{user.user}}</a></li>
+                 <li><a href=""><i class="fa fa-power-off"(click)="logOut()"></i>&nbsp;Logout</a></li>
                 </ul>
             </div>
 

@@ -19,13 +19,13 @@
         </div>
 
         <div class="col-md-2" *ngIf="logged_princi">
-                <mat-label class="labels">Select Department</mat-label>
-                <mat-select name="dept" [(ngModel)]="princi_Department">
-                    <mat-option *ngFor="let d of dept_names" [value]="d">
-                        Department - {{d}}
-                    </mat-option>
-                </mat-select>
-            </div>
+            <mat-label class="labels">Select Department</mat-label>
+            <mat-select name="dept" [(ngModel)]="princi_Department">
+                <mat-option *ngFor="let d of dept_names" [value]="d">
+                    Department - {{d}}
+                </mat-option>
+            </mat-select>
+        </div>
 
         <div class="col-md-1" *ngIf="logged_student">
             <button class="btn btn-primary search search-btn" (click)="studentsearch();" [disabled]=clicked>
@@ -98,44 +98,43 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="error_flag">
+
+        <div *ngIf="error_flag && !showSpinner">
             <p class="page-title">{{error_message1}}</p>
         </div>
-        
+
 
         <div *ngIf="firstLevelChart && !error_flag && chart_visibility && !showSpinner &&logged_student">
             <p class="page-title"><b>{{title}}</b></p>
-                <google-chart [data]='firstLevelChart' (chartSelect)="second_level($event)" data-toggle="modal"
-                    data-target="#attdetail">
-                </google-chart>
+            <google-chart [data]='firstLevelChart' (chartSelect)="second_level($event)">
+            </google-chart>
         </div>
 
         <div *ngIf="faculty_chart && !error_flag && fac_chart_visibility  && logged_faculty">
             <p class="page-title"><b>{{title}}</b></p>
-                <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)" data-toggle="modal"
-                  data-target="#fac_modal">  </google-chart>
+            <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)"> </google-chart>
         </div>
 
-        <div class="col-md-2" *ngIf="logged_hod">
+        <div class="col-md-2 facultyList" *ngIf="logged_hod">
             <div class="text-left">
-                <button class="btn btn-light btn-block text-left"
-                    *ngFor="let faculty of faculty_names" (click)="getFacultyDetails($event.target.value)" value={{faculty[0]}}>{{faculty[1]}}
-                </button>
-            </div>
-        </div>
-        
-        <div class="col-md-2" *ngIf="logged_princi">
-            <div class="text-left">
-                <button class="btn btn-light btn-block text-left"
-                    *ngFor="let faculty of faculty_names" (click)="getFacultyDetails($event.target.value)" value={{faculty[0]}}>{{faculty[1]}}
+                <button class="btn btn-primary btn-block text-left" *ngFor="let faculty of faculty_names"
+                    (click)="getFacultyDetails($event.target.value)" value={{faculty[0]}}>{{faculty[1]}}
                 </button>
             </div>
         </div>
 
-        <div class="col-md-10" *ngIf="( logged_hod || logged_princi ) && faculty_chart && !error_flag && fac_chart_visibility">
+        <div class="col-md-2 facultyList" *ngIf="logged_princi">
+            <div class="text-left">
+                <button class="btn btn-primary btn-block text-left" *ngFor="let faculty of faculty_names"
+                    (click)="getFacultyDetails($event.target.value)" value={{faculty[0]}}>{{faculty[1]}}
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-10"
+            *ngIf="( logged_hod || logged_princi ) && faculty_chart && !error_flag && fac_chart_visibility">
             <p class="page-title"><b>{{title}}</b></p>
-            <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)" data-toggle="modal"
-                data-target="#fac_modal">  </google-chart>
+            <google-chart [data]='faculty_chart' (chartSelect)="faculty_level($event)"> </google-chart>
         </div>
 
         <div *ngIf="error_flag && !showSpinner">
@@ -149,38 +148,34 @@
         <div class="modal-content">
             <div class="modal-header" style="background-color: #efeff5;">
                 <h5 class="modal-title">Attendance Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        
             <div class="modal-body">
-                <table class="table table-striped">
-                    <tr>
-
-                        <th>Course Name:</th>
-                        <th>No' classes conducted:</th>
-                        <th>No' of classes Attended:</th>
-                    </tr>
-                    <tr *ngFor="let a of attDetails">
-                        <td>{{a[0]}}</td>
-                        <td>{{a[1]}}</td>
-                        <td>{{a[2]}}</td>
-                    </tr>
-                </table>
+            <div class="row">
+                <div class="col-sm-10" *ngFor="let a of attDetails">
+                    <b>Course Name:</b>{{a[0]}}
+                </div>
             </div>
-            
+            <hr>
+            <div class="row">
+                <div class="col-md-4" *ngFor="let a of attDetails"><b># of classes conducted:&nbsp;{{a[1]}}</b></div>
+                <div class="col-md-4" *ngFor="let a of attDetails"><b># of classes Attended:&nbsp;{{a[2]}}</b></div>
+
+            </div>
+        </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fas fa-thumbs-up"></i>
                     &nbsp; OK</button>
-             </div>
+            </div>
         </div>
     </div>
 </div>
+
 <div id="fac_modal" class="modal fade" role="dialog">
     <div class="modal-dialog">
-
-            <!-- Modal content-->
+        <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header" style="background-color: #efeff5;">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -192,21 +187,21 @@
                 <div class="row">
                     <div class="col-sm-10">
 
-                        <b># Classes Conducted : </b>{{no_cls_conducted}}
+                        <b># of Classes Conducted : </b>{{no_cls_conducted}}
                     </div>
                 </div>
                 <hr>
                 <div class="row">
-                    
-                    <div class="col-md-4"><b># Total Students :&nbsp;{{total_stu_modal}}</b></div>
-                    <div class="col-md-4"><b># Total Placed :&nbsp;{{placed_modal}}</b></div>
-                    <div class="col-md-4"><b># Total Class Offers :&nbsp;{{total_pos_modal}}</b></div>
+
+                    <div class="col-md-4"><b># of Students :&nbsp;{{total_stu_modal}}</b></div>
+                    <div class="col-md-4"><b># of Students Placed :&nbsp;{{placed_modal}}</b></div>
+                    <div class="col-md-4"><b># of Positions :&nbsp;{{total_pos_modal}}</b></div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fas fa-thumbs-up"></i>
                     &nbsp; OK</button>
-             </div>
-         </div>
+            </div>
+        </div>
     </div>
 </div>

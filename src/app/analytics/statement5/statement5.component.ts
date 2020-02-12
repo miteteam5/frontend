@@ -5,7 +5,7 @@ import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces
 import { ChartSelectEvent } from 'ng2-google-charts';
 import { VirtualTimeScheduler } from 'rxjs';
 
-
+declare let $;
 @Component({
   selector: 'app-statement5',
   templateUrl: './statement5.component.html',
@@ -66,6 +66,7 @@ export class Statement5Component implements OnInit {
   total_stu_modal;
   total_pos_modal;
   no_cls_conducted;
+  
 
   constructor(private analyticsService: AnalyticsService, private authService: AuthService) { }
 
@@ -175,21 +176,22 @@ export class Statement5Component implements OnInit {
 
   graph_data(data) {
     this.showSpinner = false
-    this.title = ' Attendance %',
+    this.chart_visibility = true
+    this.title = 'Course-wise Attendance %',
       this.firstLevelChart = {
         chartType: "ColumnChart",
         dataTable: data,
         options: {
-          bar: { groupWidth: "10%" },
+          focusTarget: 'datum',
+          bar: { groupWidth: "20%" },
           vAxis: {
             title: "Percentage",
-            viewWindow: {
-              max:100,
-              min:0
-          }
+            scaleType: 'linear',
+            maxValue : '100',
+            minValue : '0'
           },
 
-          height: 800,
+          height: 600,
           hAxis: {
             title: "Courses",
             titleTextStyle: {
@@ -222,8 +224,8 @@ export class Statement5Component implements OnInit {
         data1.push([att["courseName"],att["total_classes"],att["present"]])
       }
       this.attDetails=data1
-      console.log(this.attDetails)
     })
+    $("#attdetail").modal("toggle")
   }
 
   // Faculty Module
@@ -231,23 +233,22 @@ export class Statement5Component implements OnInit {
   draw_faculty_chart(data)
   {
     this.facSpinner =true;
-   
+    this.chart_visibility = true;
     this.title = 'Course-wise Attendance %',
     this.faculty_chart = {
       chartType: "ComboChart",
       dataTable: data,
       options: {
-        bar: { groupWidth: "10%" },
+        focusTarget: 'datum',
+        bar: { groupWidth: "20%" },
         vAxis: {
           title: "Percentage",
-         
-          viewWindow: {
-            max:100,
-            min:0
-        }
+          scaleType: 'linear',
+          maxValue : '100',
+          minValue : '0'
         },
 
-        height: 800,
+        height: 600,
         hAxis: {
           title: "Courses",
           titleTextStyle: {
@@ -279,12 +280,12 @@ export class Statement5Component implements OnInit {
       this.total_stu_modal = re['totalStudents'];
       this.placed_modal = re['placedStudents'];
       this.total_pos_modal = re['totalPositions'];
-      
     })
     this.analyticsService.getNoCourse(this.current_faculty,subcode,this.terms,this.selectedyear).subscribe(res=>{
       let r=res["course"][0]
       this.no_cls_conducted=r['classes']
     })
+    $("#fac_modal").modal("toggle")
   }
 
   facultysearch()
