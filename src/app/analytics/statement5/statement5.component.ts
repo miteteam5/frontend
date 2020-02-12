@@ -123,8 +123,9 @@ export class Statement5Component implements OnInit {
     else{
       this.error_flag = true
       this.error_message1 = "Not placed yet..."
-      
     }
+
+      
     this.showSpinner = true;
     this.analyticsService.get_attendance_details(this.user_info['usn'], this.selectedyear, this.terms).subscribe(res => {
       this.attendance_details = res['attendance_percent']
@@ -163,7 +164,7 @@ export class Statement5Component implements OnInit {
     else {
       this.showSpinner = false;
       this.error_flag = true
-      this.error_message = "Data does not exist"
+      this.error_message = "Data does not exist for the entered criteria"
     }
   }
 
@@ -293,7 +294,7 @@ export class Statement5Component implements OnInit {
       let re = res["fac"];
       
       let db = [];
-      db.push(["Course Name","Attendance Percent","placePercentage"])
+      db.push(["Course Name","Attendance percentage","Placement percentage"])
       for(let r of re)
       {
         db.push([r['courseid'],r['totalPercentage'],r['placePercentage']])
@@ -306,7 +307,7 @@ export class Statement5Component implements OnInit {
       else {
         this.showSpinner = false;
         this.error_flag = true
-        this.error_message = "Data does not exist"
+        this.error_message = "Data does not exist for the entered criteria"
       }
     })
   }
@@ -320,7 +321,7 @@ export class Statement5Component implements OnInit {
     this.analyticsService.get_selected_faculty_details(fac_id,this.terms).subscribe(res =>{
       let re = res["fac"];
       let db = [];
-      db.push(["Course Name","Attendance Percent","Placement Percentage"])
+      db.push(["Course Name","Attendance percentage","Placement percentage"])
       for(let r of re)
       {
         db.push([r['courseid'],r['totalPercentage'],r['placePercentage']])
@@ -333,7 +334,7 @@ export class Statement5Component implements OnInit {
       else {
         this.showSpinner = false;
         this.error_flag = true
-        this.error_message = "Data does not exist"
+        this.error_message = "Data does not exist for the entered criteria"
       }
     })
     
