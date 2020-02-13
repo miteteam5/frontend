@@ -121,11 +121,7 @@ export class Statement5Component implements OnInit {
     if (!this.placement_status_displayed) {
       this.getPlacementDetails()
     }
-    else{
-      this.error_flag = true
-      this.error_message1 = "Not placed yet..."
-    }
-
+    
       
     this.showSpinner = true;
     this.analyticsService.get_attendance_details(this.user_info['usn'], this.selectedyear, this.terms).subscribe(res => {

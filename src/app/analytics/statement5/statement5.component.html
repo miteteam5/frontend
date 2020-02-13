@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        <h5 style="color:rgb(10, 139, 111)">Performance Analysis</h5>
+        <h5 style="color:rgb(139, 29, 10)">Performance Analysis</h5>
 
         <div class="col-md-2">
             <mat-label class="labels">Academic Year</mat-label>
@@ -99,9 +99,7 @@
             </div>
         </div>
 
-        <div *ngIf="error_flag && !showSpinner">
-            <p class="page-title">{{error_message1}}</p>
-        </div>
+        
 
 
         <div *ngIf="firstLevelChart && !error_flag && chart_visibility && !showSpinner &&logged_student">
